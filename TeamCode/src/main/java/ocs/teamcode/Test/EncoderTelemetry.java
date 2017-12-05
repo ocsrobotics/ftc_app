@@ -1,5 +1,6 @@
-package ocs.teamcode.Various;
+package ocs.teamcode.Test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by CJS on 11/4/17.
  */
 
-@TeleOp
+@Disabled
 public class EncoderTelemetry extends OpMode {
 
     DcMotor test;

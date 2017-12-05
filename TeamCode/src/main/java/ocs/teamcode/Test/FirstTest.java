@@ -1,5 +1,6 @@
 package ocs.teamcode.Test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import ocs.teamcode.Various.CLib;
  */
 
 //@TeleOp
+    @Disabled
 public class FirstTest extends OpMode {
 
     CLib CLib = new CLib();

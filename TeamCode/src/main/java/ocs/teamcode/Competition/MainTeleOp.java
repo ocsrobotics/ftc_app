@@ -38,8 +38,8 @@ public class MainTeleOp extends OpMode {
         leftDrive = hardwareMap.dcMotor.get("drive_left");
         rightDrive = hardwareMap.dcMotor.get("drive_right");
 
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      //  leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      //  rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -61,11 +61,25 @@ public class MainTeleOp extends OpMode {
 
         //Setting up color sensor servo
         colorBoom = hardwareMap.servo.get("color_boom");
+        colorBoom.setDirection(Servo.Direction.REVERSE);
+        colorBoom.setPosition(0.0);
     }
 
     public void loop() {
         //Direct input controls:
-        setDrivePower(gamepad1.right_stick_y, gamepad1.left_stick_y);
+        boolean shouldBoostRight = (gamepad1.right_trigger > 0);
+        boolean shouldBoostLeft = (gamepad1.left_trigger > 0);
+
+        telemetry.addData("RightTrigger", gamepad1.right_trigger);
+        telemetry.addData("LeftTrigger", gamepad1.left_trigger);
+
+        setDrivePower(
+                gamepad1.right_stick_y,
+                gamepad1.left_stick_y,
+                shouldBoostRight,
+                shouldBoostLeft
+        );
+
         setGrabPos(gamepad2.right_trigger);
 
         chain.setPower(gamepad2.right_stick_y * gamepad2.right_stick_y * (gamepad2.right_stick_y > 0 ? 1 : -1));
@@ -82,15 +96,30 @@ public class MainTeleOp extends OpMode {
             chainController.sendToPosition(ChainController.psNames.BOTTOM);
         }
 
-        //chainController.update();
-        colorBoom.setPosition(gamepad2.a ? 0.3 : 0.7);
+        telemetry.update();
     }
 
     //----------------------------------------------------------------------------------------------
 
-    void setDrivePower(float rPow, float lPow) {
-        rightDrive.setPower(rPow * rPow * (rPow > 0 ? 1 : -1));
-        leftDrive.setPower(lPow * lPow * (lPow > 0 ? 1 : -1));
+    void setDrivePower(float rPow, float lPow, boolean rBoost, boolean lBoost) {
+        float rightInput = (rPow * rPow * (rPow > 0 ? 1.0f : -1.0f)) / 4f;
+        float leftInput = (lPow * lPow * (lPow > 0 ? 1.0f : -1.0f)) / 4f;
+
+        if (rBoost) {
+            rightInput *= 4f;
+        }
+
+        if (lBoost) {
+            leftInput *= 4f;
+        }
+
+        rightDrive.setPower(rightInput);
+        leftDrive.setPower(leftInput);
+
+        telemetry.addData("RightInput", rightInput);
+        telemetry.addData("RightIsBoosted", rBoost);
+        telemetry.addData("LeftInput", leftInput);
+        telemetry.addData("LeftIsBoosted", lBoost);
     }
 
     void setGrabPos(float pos) {
