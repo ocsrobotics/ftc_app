@@ -18,16 +18,13 @@ public class MainTeleOp extends OpMode {
 
     CLib tools = new CLib();
 
-    ChainController chainController;
-
-    DcMotor leftDrive, rightDrive, chain;
+    DcMotor leftDrive, rightDrive, chainMotor;
     Servo leftGrab, rightGrab, colorBoom;
 
 
 
     //              !!!SET BEFORE RUNNING!!!
-    float lowChainLimit = 0;
-    float highChainLimit = 3000;
+    int chainRange = 3200;
     //              !!!SET BEFORE RUNNING!!!
 
 
@@ -38,19 +35,16 @@ public class MainTeleOp extends OpMode {
         leftDrive = hardwareMap.dcMotor.get("drive_left");
         rightDrive = hardwareMap.dcMotor.get("drive_right");
 
-      //  leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-      //  rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         //Setting up chain driver
-        chain = hardwareMap.dcMotor.get("motor_chain");
-        chain.setDirection(DcMotorSimple.Direction.REVERSE);
-        //chain.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        chain.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        chainMotor = hardwareMap.dcMotor.get("motor_chain");
 
-        chainController = new ChainController(lowChainLimit, highChainLimit, chain.getCurrentPosition(), chain);
+        chainMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        chainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        chainMotor.setTargetPosition(5);
 
 
         //Setting up grab servos
@@ -59,10 +53,17 @@ public class MainTeleOp extends OpMode {
 
         rightGrab.setDirection(Servo.Direction.REVERSE);
 
+        setGrabPos(0.0f);
+
         //Setting up color sensor servo
         colorBoom = hardwareMap.servo.get("color_boom");
         colorBoom.setDirection(Servo.Direction.REVERSE);
         colorBoom.setPosition(0.0);
+    }
+
+    public void start() {
+        chainMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        chainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void loop() {
@@ -82,19 +83,16 @@ public class MainTeleOp extends OpMode {
 
         setGrabPos(gamepad2.right_trigger);
 
-        chain.setPower(gamepad2.right_stick_y * gamepad2.right_stick_y * (gamepad2.right_stick_y > 0 ? 1 : -1));
 
+        //Augmented controls
+        if (gamepad2.right_stick_y < 0 && chainMotor.getCurrentPosition() < chainRange) {
+            chainMotor.setPower(-gamepad2.right_stick_y);
+        } else if (gamepad2.right_stick_y > 0 && chainMotor.getCurrentPosition() > 0) {
+            chainMotor.setPower(-gamepad2.right_stick_y);
+        } else {
+            chainMotor.setPower(0.0f);
+        }
 
-        //Automated controls
-        if (gamepad2.dpad_up) {
-            chainController.sendToPosition(ChainController.psNames.TOP);
-        }
-        if (gamepad2.dpad_left || gamepad2.dpad_right) {
-            chainController.sendToPosition(ChainController.psNames.CENTER);
-        }
-        if (gamepad2.dpad_down) {
-            chainController.sendToPosition(ChainController.psNames.BOTTOM);
-        }
 
         telemetry.update();
     }

@@ -1,15 +1,11 @@
 package ocs.teamcode.Competition;
 
-import android.preference.PreferenceManager;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import java.util.Timer;
 
 /**
  * Created by CJS on 12/2/17.
@@ -64,12 +60,12 @@ public class MainAutoRED extends OpMode {
 
                 colorBoom.setPosition(0.7);
 
-                if (color.red() >= 5 && color.blue() < 2) {
+                if (color.red() >= 5 && color.blue() < 3) {
                     time = getRuntime() + 1;
                     stage = Stages.BUMP_BACK;
                 }
 
-                if (color.blue() >= 2 && color.red() < 5) {
+                if (color.blue() >= 3 && color.red() < 5) {
                     time = getRuntime() + 1;
                     stage = Stages.BUMP_FORE;
                 }
@@ -79,8 +75,8 @@ public class MainAutoRED extends OpMode {
                 telemetry.addData("Stage", "Bump Back");
 
                 if (getRuntime() - time < 0) {
-                    leftDrive.setPower(0.1);
-                    rightDrive.setPower(0.1);
+                    leftDrive.setPower(-0.1);
+                    rightDrive.setPower(-0.1);
                 } else {
                     leftDrive.setPower(0.0);
                     rightDrive.setPower(0.0);
@@ -93,8 +89,8 @@ public class MainAutoRED extends OpMode {
                 telemetry.addData("Stage", "Bump Fore");
 
                 if (getRuntime() - time < 0) {
-                    leftDrive.setPower(-0.1);
-                    rightDrive.setPower(-0.1);
+                    leftDrive.setPower(0.1);
+                    rightDrive.setPower(0.1);
                 } else {
                     leftDrive.setPower(0.0);
                     rightDrive.setPower(0.0);

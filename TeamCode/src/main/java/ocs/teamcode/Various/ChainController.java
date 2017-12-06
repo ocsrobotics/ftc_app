@@ -2,45 +2,48 @@ package ocs.teamcode.Various;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import java.util.HashMap;
-
 /**
  * Created by CJS on 11/4/17.
  */
 
 public class ChainController {
-    public enum psNames {TOP, CENTER, BOTTOM}
-    public HashMap<psNames, Float> Positions = new HashMap();
+
+    public enum psNames {
+        TOP(100), CENTER(50), BOTTOM(0);
+
+        private int position;
+
+        psNames(int val) {
+            this.position = val;
+        }
+
+        public int getValue() {
+            return position;
+        }
+
+        public void setValue(int newVal) {
+            position = newVal;
+        }
+    }
 
     public psNames selectedPos = psNames.BOTTOM;
 
-    float lowEnd;
-    float highEnd;
-    float range;
-
-    float target;
+    int range;
+    int target = 0;
 
     DcMotor motor;
 
-    public ChainController(float lo, float hi, float curPos, DcMotor mtr) {
-        lowEnd = lo;
-        highEnd = hi;
-        target = curPos;
-
-        range = highEnd - lowEnd;
-
-        Positions.put(psNames.TOP, highEnd);
-        Positions.put(psNames.CENTER, (range / 2) + lowEnd);
-        Positions.put(psNames.BOTTOM, lowEnd);
-
+    public ChainController(int rng, DcMotor mtr) {
+        range = rng;
         motor = mtr;
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        psNames.CENTER.setValue((range / 2) + 20);
+        psNames.TOP.setValue(range);
     }
 
-    public void update() {
-        motor.setTargetPosition((int)target);
-    }
+    public void update() { motor.setTargetPosition(target); }
 
-    public void sendToPosition(psNames pos) {
-        target = Positions.get(pos);
-    }
+    public void sendToPosition(psNames pos) { target = pos.getValue(); }
+
 }
