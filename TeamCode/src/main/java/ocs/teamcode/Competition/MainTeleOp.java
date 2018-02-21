@@ -24,7 +24,7 @@ public class MainTeleOp extends OpMode {
 
 
     //              !!!SET BEFORE RUNNING!!!
-    int chainRange = 3200;
+    int chainRange = 3400;
     //              !!!SET BEFORE RUNNING!!!
 
 
@@ -44,8 +44,6 @@ public class MainTeleOp extends OpMode {
         chainMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         chainMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        chainMotor.setTargetPosition(5);
-
 
         //Setting up grab servos
         leftGrab = hardwareMap.servo.get("grab_left");
@@ -59,6 +57,14 @@ public class MainTeleOp extends OpMode {
         colorBoom = hardwareMap.servo.get("color_boom");
         colorBoom.setDirection(Servo.Direction.REVERSE);
         colorBoom.setPosition(0.0);
+    }
+
+    public void init_loop() {
+        if (chainMotor.getCurrentPosition() < 10) {
+            chainMotor.setPower(0.2);
+        } else {
+            chainMotor.setPower(0.0);
+        }
     }
 
     public void start() {
@@ -121,7 +127,7 @@ public class MainTeleOp extends OpMode {
     }
 
     void setGrabPos(float pos) {
-        rightGrab.setPosition(pos);
         leftGrab.setPosition(pos);
+        rightGrab.setPosition(leftGrab.getPosition());
     }
 }
